@@ -1,34 +1,17 @@
 use warp::Filter;
+use askama::Template;
+
 
 #[tokio::main]
 async fn main() {
-	let template=r##"
-		<body><!DOCTYPE html>
-<html>
-<head>
-    <title>Знакосчиталка</title>
-</head>
-<body>
-
-<p>В тексте ${letters} символов, без пробелов</p>
-<p>В тексте ${length} символов, с пробелами</p>
-
-<div style="width: 80vw">
-    <textarea style="width: 80vw; height: 30vh" id="content" name="input"  form="input">${was}</textarea>
-    <br>
-    <br>
-    <form style="float: right;" action="/counter" id="clean" method="get">
-        <input type="submit" value="Очистить">
-    </form>
-    <form style="float: left;" action="/counter" id="input" method="post">
-        <input type="submit" value="Рассчитать">
-    </form>
-</div>
-</body>"##;
-
 	let hello = warp::path!("hello" / String).map(|name| format!("Hello, {}!", name));
 
-	let html = warp::path!("counter").map(move || warp::reply::html(template) );
+	let html = warp::path!("counter")
+		.map(|| {
+			let data = Page::init();
+			data.render().unwrap()
+		})
+		.map(|rendered| warp::reply::html(rendered));
 
 	let routes = warp::get().and(hello).or(html);
 	
@@ -36,4 +19,26 @@ async fn main() {
 	warp::serve(routes)
 		.run(([127,0,0,1],3030))
 	.await;
+}
+
+
+#[derive(Template)]
+#[template(path="test.html")]
+struct Page {
+	was: String,
+	letters: usize,
+	length: usize,
+}
+
+impl Page {
+	fn create(s:String)->Page {
+		Page {
+			letters: s.len(),
+			length: s.len(),
+			was: s
+		}
+	}
+	fn init() -> Page {
+		Page::create(String::from(""))
+	}
 }
