@@ -45,9 +45,21 @@ struct Page {
 
 impl Page {
 	fn create(s:String)->Page {
+		let mut total:usize=0;
+		let mut letters:usize=0;
+		s.chars()
+			.for_each(|letter|{
+				if !(letter=='\r'){
+					total+=1;
+				}
+				if !letter.is_whitespace() {
+					letters+=1;
+				}
+			});
+		
 		Page {
-			letters: s.len(),
-			length: s.len(),
+			letters: letters, 
+			length: total,
 			was: s
 		}
 	}
