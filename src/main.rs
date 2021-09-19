@@ -1,12 +1,13 @@
-use warp::Filter;
+use warp::{http::Uri, Filter};
 use askama::Template;
 use std::collections::HashMap;
 
 
 #[tokio::main]
 async fn main() {
-	let hello = warp::path!("hello" / String).map(|name| format!("Hello, {}!", name));
-	
+	let root = warp::path::end().map(|| {
+		warp::redirect(Uri::from_static("counter"))
+	});
 	let counter=warp::path!("counter");
 
 	let input_page = counter
@@ -26,7 +27,7 @@ async fn main() {
 		})
 		.map(|rendered| warp::reply::html(rendered));
 
-	let routes = hello.or(input_page).or(results);
+	let routes = root.or(input_page).or(results);
 	
 	warp::serve(routes)
 		.run(([127,0,0,1],3030))
