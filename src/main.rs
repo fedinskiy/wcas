@@ -1,20 +1,32 @@
 use warp::Filter;
 use askama::Template;
+use std::collections::HashMap;
 
 
 #[tokio::main]
 async fn main() {
 	let hello = warp::path!("hello" / String).map(|name| format!("Hello, {}!", name));
+	
+	let counter=warp::path!("counter");
 
-	let html = warp::path!("counter")
+	let input_page = counter
+		.and(warp::get())
 		.map(|| {
 			let data = Page::init();
 			data.render().unwrap()
 		})
 		.map(|rendered| warp::reply::html(rendered));
+		
+	let results = counter
+		.and(warp::post())
+		.and(warp::body::form())
+		.map(|mut content: HashMap<String, String> | {
+			let data = Page::create(content.remove("input").unwrap());
+			data.render().unwrap()
+		})
+		.map(|rendered| warp::reply::html(rendered));
 
-	let routes = warp::get().and(hello).or(html);
-	
+	let routes = hello.or(input_page).or(results);
 	
 	warp::serve(routes)
 		.run(([127,0,0,1],3030))
