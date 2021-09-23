@@ -1,6 +1,10 @@
-use warp::{http::Uri, Filter};
-use askama::Template;
 use std::collections::HashMap;
+use std::convert::Infallible;
+
+use warp::{http::Uri, Filter, Rejection, Reply};
+use warp::http::StatusCode;
+
+use askama::Template;
 
 
 #[tokio::main]
@@ -21,17 +25,29 @@ async fn main() {
 	let results = counter
 		.and(warp::post())
 		.and(warp::body::form())
+		.and(warp::body::content_length_limit(1024 * 100))
 		.map(|mut content: HashMap<String, String> | {
 			let data = Page::create(content.remove("input").unwrap());
 			data.render().unwrap()
 		})
 		.map(|rendered| warp::reply::html(rendered));
 
-	let routes = root.or(input_page).or(results);
+	let routes = root.or(input_page).or(results).recover(bad_request);
 	
 	warp::serve(routes)
 		.run(([127,0,0,1],3030))
 	.await;
+}
+
+async fn bad_request(err: Rejection) -> Result<impl Reply, Infallible> {
+	println!("{:?}",err);
+	if err.is_not_found() {
+		 Ok(warp::reply::with_status("Неверный путь", StatusCode::NOT_FOUND))
+	} else if let Some(_) = err.find::<warp::reject::PayloadTooLarge>() {
+		Ok(warp::reply::with_status("Слишком длинный текст!", StatusCode::BAD_REQUEST))
+	} else {
+		Ok(warp::reply::with_status("Bad Request", StatusCode::BAD_REQUEST))
+	 }
 }
 
 
