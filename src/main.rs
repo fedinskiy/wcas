@@ -24,10 +24,10 @@ async fn main() {
 		
 	let results = counter
 		.and(warp::post())
-		.and(warp::body::form())
 		.and(warp::body::content_length_limit(1024 * 100))
-		.map(|mut content: HashMap<String, String> | {
-			let data = Page::create(content.remove("input").unwrap());
+		.and(get_input())
+		.map(|input: String| {
+			let data = Page::create(input);
 			data.render().unwrap()
 		})
 		.map(|rendered| warp::reply::html(rendered));
@@ -39,10 +39,22 @@ async fn main() {
 	.await;
 }
 
+fn get_input() -> impl Filter<Extract = (String,), Error = Rejection> + Copy {
+    warp::body::form().and_then(|mut content: HashMap<String, String> | async move {
+        if let Some(input) = content.remove("input") {
+            Ok(input)
+        } else {
+            Err(warp::reject::custom(EmptyBody))
+        }
+    })
+}
+
 async fn bad_request(err: Rejection) -> Result<impl Reply, Infallible> {
 	println!("{:?}",err);
 	if err.is_not_found() {
 		 Ok(warp::reply::with_status("Неверный путь", StatusCode::NOT_FOUND))
+	} else if let Some(_) = err.find::<EmptyBody>() {
+		Ok(warp::reply::with_status("Отсутствует поле!", StatusCode::BAD_REQUEST))
 	} else if let Some(_) = err.find::<warp::reject::PayloadTooLarge>() {
 		Ok(warp::reply::with_status("Слишком длинный текст!", StatusCode::BAD_REQUEST))
 	} else {
@@ -50,6 +62,9 @@ async fn bad_request(err: Rejection) -> Result<impl Reply, Infallible> {
 	 }
 }
 
+#[derive(Debug)]
+struct EmptyBody;
+impl warp::reject::Reject for EmptyBody {}
 
 #[derive(Template)]
 #[template(path="test.html")]
