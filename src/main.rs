@@ -34,8 +34,9 @@ async fn main() {
 
 	let routes = root.or(input_page).or(results).recover(bad_request);
 	
+	println!("Starting the application");
 	warp::serve(routes)
-		.run(([127,0,0,1],3030))
+		.run(([0,0,0,0],3030))
 	.await;
 }
 
