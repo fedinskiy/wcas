@@ -30,3 +30,10 @@ OR
 Default parameters expect Raspberry Pi 4 and Raspbian buster, but can be tuned to target any Linux system with systemd(required for autostart scripts ) and at least Tier 2 Rust support[1].
 
 [1] https://doc.rust-lang.org/stable/rustc/platform-support.html
+
+
+## REMOVAL:
+1. Copy `makefile` to the target machine:
+`rsync --progress makefile ${to}`
+2. Run uninstall script:
+`make uninstall`

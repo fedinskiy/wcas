@@ -35,3 +35,10 @@ install:
 	systemctl stop wcas
 	systemctl start wcas
 	systemctl enable wcas
+
+.PHONY: uninstall
+uninstall:
+	systemctl stop wcas
+	systemctl disable wcas
+	rm $(BINDIR)wcas
+	rm $(SYSTEMD)wcas.service
