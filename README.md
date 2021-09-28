@@ -16,7 +16,7 @@ Same as https://github.com/fedinskiy/symbol-counter, but rewritten in Rust with 
 `cross build --target armv7-unknown-linux-gnueabihf`
 
 
-## Instalaltion:
+## Instalation:
 1. Build for desired architecture and type of deployment(edit makefile, if needed):
 `make`
 OR
