@@ -32,7 +32,7 @@ async fn main() {
 	let routes = root.or(input_page).or(results).recover(bad_request);
 
 	println!("Starting the application");
-	warp::serve(routes).run(([0, 0, 0, 0], 3030)).await;
+	warp::serve(routes).run(([0, 0, 0, 0], 8080)).await;
 }
 
 fn get_input() -> impl Filter<Extract = (String,), Error = Rejection> + Copy {

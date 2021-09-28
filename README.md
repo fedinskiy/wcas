@@ -16,13 +16,13 @@ Same as https://github.com/fedinskiy/symbol-counter, but rewritten in Rust with 
 `cross build --target armv7-unknown-linux-gnueabihf`
 
 
-## Instalation:
+## Installation:
 1. Build for desired architecture and type of deployment(edit makefile, if needed):
 `make`
 OR
 `make EXEC=$(PROD) all` for production build
 2. Copy file `target/wcas.tar.xz` to the target machine:
-`rsync --progress target/wcas.tar.xz ${your machine here}`
+`rsync --progress target/wcas.tar.xz ${to}`
 3. Unarchive and install:
 `tar -xaf wcas.tar.xz`
 `make install -f wcas/makefile`

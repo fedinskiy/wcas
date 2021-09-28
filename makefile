@@ -32,5 +32,6 @@ SYSTEMD=/etc/systemd/system/
 install:
 	install wcas $(BINDIR)
 	install wcas.service $(SYSTEMD)
+	systemctl stop wcas
 	systemctl start wcas
 	systemctl enable wcas
