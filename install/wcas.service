@@ -1,0 +1,15 @@
+[Unit]
+Description=Word Counter As a Service
+Documentation=https://github.com/fedinskiy/wcas
+After=network-online.target
+
+[Service]
+Type=simple
+UMask=027
+
+ExecStart=/usr/bin/wcas
+
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
