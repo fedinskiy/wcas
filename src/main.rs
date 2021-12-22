@@ -105,3 +105,56 @@ impl Page {
 		Page::create(String::from(""))
 	}
 }
+
+#[cfg(test)]
+mod tests {
+	use super::Page;
+
+	#[test]
+	fn smoke() {
+		let page = Page::create(String::from("wq"));
+		assert_eq!(page.letters, 2);
+		assert_eq!(page.length, 2);
+		assert_eq!(page.was, "wq");
+	}
+
+	#[test]
+	fn unicode() {
+		let page = Page::create(String::from("Привет, příteli!"));
+		assert_eq!(page.letters, 15);
+		assert_eq!(page.length, 16);
+		assert_eq!(page.was, "Привет, příteli!");
+	}
+
+	#[test]
+	fn multiline() {
+		let page = Page::create(String::from(
+			"If you see Kay
+tell him he may,
+see you in tea,
+tell him from me!",
+		));
+		assert_eq!(page.letters, 50);
+		assert_eq!(page.length, 65);
+		assert_eq!(
+			page.was,
+			"If you see Kay\ntell him he may,\nsee you in tea,\ntell him from me!"
+		);
+	}
+
+	#[test]
+	fn multiline_windows() {
+		let page = Page::create(String::from(
+			"If you see Kay\ntell him he may,\nsee you in tea,\ntell him from me!",
+		));
+		assert_eq!(page.letters, 50);
+		assert_eq!(page.length, 65);
+		assert_eq!(
+			page.was,
+			"If you see Kay
+tell him he may,
+see you in tea,
+tell him from me!"
+		);
+	}
+}
