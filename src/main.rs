@@ -6,14 +6,14 @@ use warp::{http::Response, http::Uri, Filter, Rejection, Reply};
 
 use askama::Template;
 
-static FAVICON_FILE: &'static [u8] = include_bytes!("kate.ico");
+static FAVICON_FILE: &'static [u8] = include_bytes!("calculator.svg");
 
 #[tokio::main]
 async fn main() {
 	let root = warp::path::end().map(|| warp::redirect(Uri::from_static("counter")));
 	let counter = warp::path!("counter");
 
-	let favicon = warp::path!("favicon.ico")
+	let favicon = warp::path!("favicon.svg")
 		.and(warp::get())
 		.map(|| Response::builder().body(FAVICON_FILE));
 
