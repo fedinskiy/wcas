@@ -1,9 +1,9 @@
 # wcas
 Word Counter(https://linux.die.net/man/1/wc) as a Service.
 
-Web application, counts symbols in a text, including and excluding spaces. Proper handling of symbols, which do not fit in two bytes are not guaranteed 🙃.
+Web application, counts symbols in a text, including and excluding spaces. Proper handling of symbols, which do not fit in two bytes is not guaranteed 🙃.
 
-Same as https://github.com/fedinskiy/symbol-counter, but rewritten in Rust with warp and askama.
+Same as https://github.com/fedinskiy/symbol-counter, but rewritten in Rust using warp and askama.
 
 ## Build:
 `cargo build`
@@ -22,12 +22,13 @@ Same as https://github.com/fedinskiy/symbol-counter, but rewritten in Rust with 
 OR
 `make EXEC=$(PROD) all` for production build
 2. Copy file `target/wcas.tar.xz` to the target machine:
-`rsync --progress target/wcas.tar.xz ${to}`
+`rsync --progress target/wcas.tar.xz ${user}@${host}:${path}`
 3. Unarchive and install:
 `tar -xaf wcas.tar.xz`
-`make install -f wcas/makefile`
+`cd wcas`
+`make install makefile`
 
-Default parameters expect Raspberry Pi 4 and Raspbian buster, but can be tuned to target any Linux system with systemd(required for autostart scripts ) and at least Tier 2 Rust support[1].
+Default parameters expect Raspberry Pi 4 and Raspbian Buster, but can be tuned to target any Linux system with systemd(required for autostart scripts ) and at least Tier 2 Rust support[1].
 
 [1] https://doc.rust-lang.org/stable/rustc/platform-support.html
 

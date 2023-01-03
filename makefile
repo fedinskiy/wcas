@@ -1,5 +1,5 @@
 #change this line if you're targeting some other architecture, e.g. x86_64-unknown-linux-gnu 
-ARCH=armv7-unknown-linux-gnueabihf
+ARCH=aarch64-unknown-linux-gnu
 
 DEBUG=target/$(ARCH)/debug/wcas
 PROD=target/$(ARCH)/release/wcas
