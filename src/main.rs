@@ -25,6 +25,16 @@ async fn main() {
 		})
 		.map(|rendered| warp::reply::html(rendered));
 
+	let lowered_results = warp::path!("lower")
+		.and(warp::post())
+		.and(warp::body::content_length_limit(1024 * 100))
+		.and(get_input())
+		.map(|input: String| {
+			let data = Page::lower(input);
+			data.render().unwrap()
+		})
+		.map(|rendered| warp::reply::html(rendered));
+
 	let results = counter
 		.and(warp::post())
 		.and(warp::body::content_length_limit(1024 * 100))
@@ -39,6 +49,7 @@ async fn main() {
 		.or(favicon)
 		.or(input_page)
 		.or(results)
+		.or(lowered_results)
 		.recover(bad_request);
 
 	println!("Starting the application");
@@ -111,6 +122,14 @@ impl Page {
 		}
 	}
 
+	fn lower(s: String) -> Page {
+		Page {
+			letters: 0,
+			length: 0,
+			text: s.to_lowercase(),
+		}
+	}
+
 	fn init() -> Page {
 		Page::create(String::from(""))
 	}
@@ -137,6 +156,12 @@ mod tests {
 	}
 
 	#[test]
+	fn unicode_lower() {
+		let page = Page::lower(String::from("Привет, Tomáše!"));
+		assert_eq!(page.text, "привет, tomáše!");
+	}
+
+	#[test]
 	fn multiline() {
 		let page = Page::create(String::from(
 			"If you see Kay
@@ -149,6 +174,20 @@ tell him from me!",
 		assert_eq!(
 			page.text,
 			"If you see Kay\ntell him he may,\nsee you in tea,\ntell him from me!"
+		);
+	}
+
+	#[test]
+	fn multiline_lower() {
+		let page = Page::lower(String::from(
+			"Скажи-ка дядя,
+Ведь не даром,
+Москва, спаленная пожаром,
+Французу отдана?",
+		));
+		assert_eq!(
+			page.text,
+			"скажи-ка дядя,\nведь не даром,\nмосква, спаленная пожаром,\nфранцузу отдана?"
 		);
 	}
 

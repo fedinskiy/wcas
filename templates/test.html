@@ -13,11 +13,10 @@
     <textarea style="width: 80vw; height: 30vh" id="content" name="input"  form="input">{{text}}</textarea>
     <br>
     <br>
-    <form style="float: right;" action="/counter" id="clean" method="get">
-        <input type="submit" value="Очистить">
-    </form>
-    <form style="float: left;" action="/counter" id="input" method="post">
-        <input type="submit" value="Рассчитать">
+    <form action="/counter" id="input" method="post">
+        <input style="float: left;" type="submit" value="Рассчитать">
+        <input style="float: left;" type="submit" value="В нижний регистр" formaction="/lower">
+        <input style="float: right;" type="submit" value="Очистить" formmethod="get">
     </form>
 </div>
 </body>
