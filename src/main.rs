@@ -2,14 +2,20 @@ use std::collections::HashMap;
 use std::convert::Infallible;
 
 use warp::http::StatusCode;
-use warp::{http::Uri, Filter, Rejection, Reply};
+use warp::{http::Response, http::Uri, Filter, Rejection, Reply};
 
 use askama::Template;
+
+static FAVICON_FILE: &'static [u8] = include_bytes!("kate.ico");
 
 #[tokio::main]
 async fn main() {
 	let root = warp::path::end().map(|| warp::redirect(Uri::from_static("counter")));
 	let counter = warp::path!("counter");
+
+	let favicon = warp::path!("favicon.ico")
+		.and(warp::get())
+		.map(|| Response::builder().body(FAVICON_FILE));
 
 	let input_page = counter
 		.and(warp::get())
@@ -29,7 +35,11 @@ async fn main() {
 		})
 		.map(|rendered| warp::reply::html(rendered));
 
-	let routes = root.or(input_page).or(results).recover(bad_request);
+	let routes = root
+		.or(favicon)
+		.or(input_page)
+		.or(results)
+		.recover(bad_request);
 
 	println!("Starting the application");
 	warp::serve(routes).run(([0, 0, 0, 0], 8080)).await;
@@ -77,7 +87,7 @@ impl warp::reject::Reject for EmptyBody {}
 #[derive(Template)]
 #[template(path = "test.html")]
 struct Page {
-	was: String,
+	text: String,
 	letters: usize,
 	length: usize,
 }
@@ -94,13 +104,13 @@ impl Page {
 				letters += 1;
 			}
 		});
-
 		Page {
 			letters: letters,
 			length: total,
-			was: s,
+			text: s,
 		}
 	}
+
 	fn init() -> Page {
 		Page::create(String::from(""))
 	}
@@ -115,7 +125,7 @@ mod tests {
 		let page = Page::create(String::from("wq"));
 		assert_eq!(page.letters, 2);
 		assert_eq!(page.length, 2);
-		assert_eq!(page.was, "wq");
+		assert_eq!(page.text, "wq");
 	}
 
 	#[test]
@@ -123,7 +133,7 @@ mod tests {
 		let page = Page::create(String::from("Привет, příteli!"));
 		assert_eq!(page.letters, 15);
 		assert_eq!(page.length, 16);
-		assert_eq!(page.was, "Привет, příteli!");
+		assert_eq!(page.text, "Привет, příteli!");
 	}
 
 	#[test]
@@ -137,7 +147,7 @@ tell him from me!",
 		assert_eq!(page.letters, 50);
 		assert_eq!(page.length, 65);
 		assert_eq!(
-			page.was,
+			page.text,
 			"If you see Kay\ntell him he may,\nsee you in tea,\ntell him from me!"
 		);
 	}
@@ -150,7 +160,7 @@ tell him from me!",
 		assert_eq!(page.letters, 50);
 		assert_eq!(page.length, 65);
 		assert_eq!(
-			page.was,
+			page.text,
 			"If you see Kay
 tell him he may,
 see you in tea,
