@@ -101,23 +101,33 @@ struct Page {
 	text: String,
 	letters: usize,
 	length: usize,
+	words: usize,
 }
 
 impl Page {
 	fn create(s: String) -> Page {
 		let mut total: usize = 0;
 		let mut letters: usize = 0;
+		let mut words: usize = 0;
+		let mut processing_word: bool = false;
 		s.chars().for_each(|letter| {
 			if !(letter == '\r') {
 				total += 1;
 			}
 			if !letter.is_whitespace() {
 				letters += 1;
+				if !processing_word && letter.is_alphabetic() {
+					words += 1;
+					processing_word = true;
+				}
+			} else {
+				processing_word = false;
 			}
 		});
 		Page {
 			letters: letters,
 			length: total,
+			words: words,
 			text: s,
 		}
 	}
@@ -126,6 +136,7 @@ impl Page {
 		Page {
 			letters: 0,
 			length: 0,
+			words: 0,
 			text: s.to_lowercase(),
 		}
 	}
@@ -144,6 +155,7 @@ mod tests {
 		let page = Page::create(String::from("wq"));
 		assert_eq!(page.letters, 2);
 		assert_eq!(page.length, 2);
+		assert_eq!(page.words, 1);
 		assert_eq!(page.text, "wq");
 	}
 
@@ -152,6 +164,7 @@ mod tests {
 		let page = Page::create(String::from("Привет, příteli!"));
 		assert_eq!(page.letters, 15);
 		assert_eq!(page.length, 16);
+		assert_eq!(page.words, 2);
 		assert_eq!(page.text, "Привет, příteli!");
 	}
 
@@ -171,6 +184,7 @@ tell him from me!",
 		));
 		assert_eq!(page.letters, 50);
 		assert_eq!(page.length, 65);
+		assert_eq!(page.words, 16);
 		assert_eq!(
 			page.text,
 			"If you see Kay\ntell him he may,\nsee you in tea,\ntell him from me!"
@@ -198,6 +212,7 @@ tell him from me!",
 		));
 		assert_eq!(page.letters, 50);
 		assert_eq!(page.length, 65);
+		assert_eq!(page.words, 16);
 		assert_eq!(
 			page.text,
 			"If you see Kay
@@ -205,5 +220,14 @@ tell him he may,
 see you in tea,
 tell him from me!"
 		);
+	}
+
+	#[test]
+	fn dash() {
+		let page = Page::create(String::from("Не пойман — не вор!"));
+		assert_eq!(page.letters, 15);
+		assert_eq!(page.length, 19);
+		assert_eq!(page.words, 4);
+		assert_eq!(page.text, "Не пойман — не вор!");
 	}
 }
