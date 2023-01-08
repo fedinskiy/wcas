@@ -1,0 +1,26 @@
+---
+- hosts: all
+  gather_facts: no
+  vars:
+    build_dir: target/package/wcas
+    bin_dir: /usr/bin/
+    systemd_dir: /etc/systemd/system/
+    service: wcas.service
+  tasks:
+  - name: copy the binary
+    copy: 
+      src: "{{build_dir}}/wcas"
+      dest: "{{bin_dir}}"
+    become: yes
+  - name: copy service file
+    copy: 
+      src: "{{build_dir}}/{{service}}"
+      dest: "{{systemd_dir}}"
+    become: yes
+  - name: restart the service
+    systemd:
+      name: "{{service}}"
+      enabled: yes
+      state: restarted
+      daemon_reload: yes
+    become: yes

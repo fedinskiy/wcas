@@ -20,13 +20,15 @@ Same as https://github.com/fedinskiy/symbol-counter, but rewritten in Rust using
 1. Build for desired architecture and type of deployment(edit makefile, if needed):
 `make`
 OR
-`make EXEC=$(PROD) all` for production build
+`make -e 'EXEC=$(PROD)' all` for production build. Do not forget to remove `target` folder beforehead.
 2. Copy file `target/wcas.tar.xz` to the target machine:
 `rsync --progress target/wcas.tar.xz ${user}@${host}:${path}`
 3. Unarchive and install:
 `tar -xaf wcas.tar.xz`
 `cd wcas`
 `make install makefile`
+ 
+ Points 3 and 4 can be replaced by running `ansible-playbook install/install.yml` if Ansible is installed on the host machine.
 
 Default parameters expect Raspberry Pi 4 and Raspbian Buster, but can be tuned to target any Linux system with systemd(required for autostart scripts ) and at least Tier 2 Rust support[1].
 
