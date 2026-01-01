@@ -9,11 +9,19 @@ Same as https://github.com/fedinskiy/symbol-counter, but rewritten in Rust using
 `cargo build`
 
 
-## Cross-build:
+## Cross-build
+
+### Using `cross` (probably not working anymore):
 1. Install a tool for a crosslinking and cross-compilation(https://github.com/rust-embedded/cross):
 `cargo install cross`
 2. Build an executable file:
 `cross build --target armv7-unknown-linux-gnueabihf`
+
+### Using OS tools:
+1. Install rust tools: `rustup target add aarch64-unknown-linux-gnu --toolchain stable`
+2. Install linker for target architecture: `sudo apt install gcc-aarch64-linux-gnu`
+3. (for new acrhitectures) Point cargo to the linker in .cargo/config.toml (see the file)
+4. Do cross build: `cargo build --target aarch64-unknown-linux-gnu` or `cargo build --target aarch64-unknown-linux-gnu --release`
 
 
 ## Installation:
@@ -28,9 +36,8 @@ OR
 `cd wcas`
 `make install makefile`
  
- Points 3 and 4 can be replaced by running `ansible-playbook install/install.yml` if Ansible is installed on the host machine.
 
-Default parameters expect Raspberry Pi 4 and Raspbian Buster, but can be tuned to target any Linux system with systemd(required for autostart scripts ) and at least Tier 2 Rust support[1].
+Default parameters expect Raspberry Pi 4 and Linux on ARM64, but can be tuned to target any Linux system with systemd(required for autostart scripts ) and at least Tier 2 Rust support[1].
 
 [1] https://doc.rust-lang.org/stable/rustc/platform-support.html
 

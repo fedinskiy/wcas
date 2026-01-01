@@ -21,24 +21,24 @@ $(PACKAGE): $(EXEC)
 	tar -caf $(PACKAGE) --directory=$(NOT_ARCHIVED_PATH) wcas
 
 $(DEBUG):
-	cross build --target $(ARCH)
+	cargo build --target $(ARCH)
 $(PROD):
-	cross build --release --target $(ARCH)
+	cargo build --release --target $(ARCH)
 
 BINDIR=/usr/bin/
-SYSTEMD=/etc/systemd/system/
+SYSTEMD=/etc/xdg/systemd/user/
 
 .PHONY: install
 install:
-	install wcas $(BINDIR)
-	install wcas.service $(SYSTEMD)
-	systemctl stop wcas
-	systemctl start wcas
-	systemctl enable wcas
+	sudo install wcas $(BINDIR)
+	sudo install wcas.service $(SYSTEMD)
+	systemctl --user stop wcas
+	systemctl --user start wcas
+	systemctl --user enable wcas
 
 .PHONY: uninstall
 uninstall:
-	systemctl stop wcas
-	systemctl disable wcas
-	rm $(BINDIR)wcas
-	rm $(SYSTEMD)wcas.service
+	systemctl --user stop wcas
+	systemctl --user disable wcas
+	sudo rm $(BINDIR)wcas
+	sudo rm $(SYSTEMD)wcas.service
